@@ -1,15 +1,47 @@
-# Learning _Flask_ through NeuralNine
+# Lesson 1
 
-Repository made to organize my learning about Flask from NeuralNine.
+In this lesson we learn how to create and run a Flask project, going through the all the steps needed from start to finish.
+We will create a virtual environment, install Flask, create a Flask project, and run the Flask project.
 
-## Organization
+## Step 1: Virtual Environment
 
-Every lesson will be separated by a branch.
+First thing we must do to work with Flask is create and activate a virtual environment to separate our project libraries from our system libraries.
 
-In each branch, commits will be in chronological ordered based on how the code changes through the lesson.
+1. Run `python -m venv .venv` to create a virtual environment.
+2. Run `source .venv/bin/activate` to activate the virtual environment.
 
-The README.md of each branch will contain useful information about the lesson.
+## Step 2: Install Flask
 
-## Getting started
+Now that we have a virtual environment, we can install Flask.
 
-Simply head to the [**branches**](https://github.com/leonardomlouzas/NeuralNine/branches) page of this repository and click on the branch you want to check.
+1. Run `pip install Flask` to install Flask.
+
+## Step 3: Create a Flask Project
+
+After that we can create our Flask project.
+
+1. In the root directory of our project, create a file called `app.py`.
+2. Inside the `app.py` file, insert this:
+
+   ```
+   from flask import Flask
+
+
+   app = Flask(__name__)
+
+   @app.route("/")
+   def hello_world():
+       return "<p>Hello, World!</p>"
+
+
+   if __name__ == "__main__":
+       app.run(debug=True)
+
+   ```
+
+## Step 4: Run the Flask Project
+
+After that, we successfully have created a minimal Flask project. Let's see if we can run it.
+
+1. Run `python app.py` to run the Flask project.
+2. Open your browser and go to `http://127.0.0.1:5000/` to see the result
