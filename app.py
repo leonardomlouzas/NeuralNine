@@ -12,6 +12,15 @@ def hello_world():
 def hello_world():
     return "<p>Hello, World!</p>"
 
+# Dynamic URLS
+@app.route('/greet/<username>')
+def greet(username):
+    return f"<p>Hello, {username}</p>"
+
+@app.route('/add/<int:num1>/<int:num2>')
+def add(num1, num2):
+    return f"<p>{num1} + {num2} = {num1 + num2}</p>"
+
 
 if __name__ == "__main__":
     app.run(debug=True)
