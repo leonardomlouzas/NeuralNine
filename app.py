@@ -27,6 +27,14 @@ def parameters():
     name = request.args.get('name')
     return f"<p>Hello, {name}</p>"
 
+# HTTP methods
+@app.route('/hello', methods=['GET', 'POST'])
+def greet():
+    if request.method == 'GET':
+        return "<p>You made a GET request!</p>"
+    elif request.method == 'POST':
+        return "<p>You made a POST request!</p>"
+
 
 if __name__ == "__main__":
     app.run(debug=True)
