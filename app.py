@@ -9,7 +9,7 @@ def hello_world():
 
 # Routes
 @app.route('/hello')
-def hello_world():
+def new_route():
     return "<p>Hello, World!</p>"
 
 # Dynamic URLS
@@ -29,12 +29,13 @@ def parameters():
 
 # HTTP methods
 @app.route('/hello', methods=['GET', 'POST'])
-def greet():
+def hello():
     if request.method == 'GET':
         return "<p>You made a GET request!</p>"
     elif request.method == 'POST':
         return "<p>You made a POST request!</p>"
 
+# Status codes
 
 if __name__ == "__main__":
     app.run(debug=True)
