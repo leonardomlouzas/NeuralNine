@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request
 
 
 app = Flask(__name__)
@@ -20,6 +20,12 @@ def greet(username):
 @app.route('/add/<int:num1>/<int:num2>')
 def add(num1, num2):
     return f"<p>{num1} + {num2} = {num1 + num2}</p>"
+
+# URL parameters
+@app.route('/parameters')
+def parameters():
+    name = request.args.get('name')
+    return f"<p>Hello, {name}</p>"
 
 
 if __name__ == "__main__":
