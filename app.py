@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, make_response
 
 
 app = Flask(__name__)
@@ -36,6 +36,16 @@ def hello():
         return "<p>You made a POST request!</p>"
 
 # Status codes
+@app.route('/status_code_easy')
+def easy():
+    return "<p>easy method</p>", 201
+
+@app.route('/status_code_complex')
+def complex():
+    response = make_response("<p>complex method</p>")
+    response.status_code = 201
+    return response
+
 
 if __name__ == "__main__":
     app.run(debug=True)
