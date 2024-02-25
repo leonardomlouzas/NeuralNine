@@ -1,47 +1,103 @@
-# Lesson 1
+# Lesson 2
 
-In this lesson we learn how to create and run a Flask project, going through the all the steps needed from start to finish.
-We will create a virtual environment, install Flask, create a Flask project, and run the Flask project.
+In this lesson we learn about routes, URL parameters/path, dynamic URLs and different types of requests.
 
-## Step 1: Virtual Environment
+## Routes
 
-First thing we must do to work with Flask is create and activate a virtual environment to separate our project libraries from our system libraries.
+In Flask, we can create as many endpoint as we want. For that, simply create a function with the `@app.route('/$endpoint_name')` decorator. The name of the function doesn't need to match the name of the endpoint.
 
-1. Run `python -m venv .venv` to create a virtual environment.
-2. Run `source .venv/bin/activate` to activate the virtual environment.
+```python
+@app.route('/hello')
+def new_route():
+    return "<p>Hello, World!</p>"
+```
 
-## Step 2: Install Flask
+## Dynamic URLs
 
-Now that we have a virtual environment, we can install Flask.
+We can also create dynamic URLs.
 
-1. Run `pip install Flask` to install Flask.
+Using variables in the URL itself:
 
-## Step 3: Create a Flask Project
+```python
+@app.route('/greet/<username>')
+def greet(username):
+    return f"<p>Hello, {username}</p>"
+```
 
-After that we can create our Flask project.
+Variables are treated as strings by default. We can change that by specifying the type of the variables on the url:
 
-1. In the root directory of our project, create a file called `app.py`.
-2. Inside the `app.py` file, insert this:
+```python
+@app.route('/add/<int:num1>/<int:num2>')
+def add(num1, num2):
+    return f"<p>{num1} + {num2} = {num1 + num2}</p>"
+```
 
-   ```
-   from flask import Flask
+## URL parameters
 
+Using url parameters is a little different than using variables. Before anything, we have to import `request` from flask, so we get access to the whole request, including the parameters.
 
-   app = Flask(__name__)
+```python
+from flask import request
+```
 
-   @app.route("/")
-   def hello_world():
-       return "<p>Hello, World!</p>"
+Now we can access the parameters using `request.args`. and use them as we want inside our route function:
 
+```python
+@app.route('/parameters')
+def parameters():
+    name = request.args.get('name')
+    return f"<p>Hello, {name}</p>"
+```
 
-   if __name__ == "__main__":
-       app.run(debug=True)
+## HTTP methods
 
-   ```
+By default, Flask functions only supports GET requests. But we can easily change that by adding a new argument on the function decorator of our route. For example, if we want to support both GET and POST requests, we can do this:
 
-## Step 4: Run the Flask Project
+```python
+@app.route('/greet', methods=['GET', 'POST'])
+```
 
-After that, we successfully have created a minimal Flask project. Let's see if we can run it.
+With that we can change our function behavior depending on the request method. But before anything, we have to import `request` from flask, so we get access to the whole request, including the parameters.
 
-1. Run `python app.py` to run the Flask project.
-2. Open your browser and go to `http://127.0.0.1:5000/` to see the result
+```python
+from flask import request
+```
+
+Finally, we can check the request method with `request.method` and act accordingly:
+
+```python
+@app.route('/hello', methods=['GET', 'POST'])
+def hello():
+    if request.method == 'GET':
+        return "<p>You made a GET request!</p>"
+    elif request.method == 'POST':
+        return "<p>You made a POST request!</p>"
+```
+
+## Status Codes
+
+By default, the status code of the response is 200, which means "OK". But there are different ways to change that status code.
+
+The easiest way would be by specifying the status code as the second parameter of the `return` function:
+
+```python
+@app.route('/status_code_easy')
+def easy():
+    return "<p>easy method</p>", 201
+```
+
+A more refined way of doing it would be by creating the response object and adding the status code in there. For that, we need to import `make_response` from flask:
+
+```python
+from flask import make_response
+```
+
+Now we can create the response object and add the status code:
+
+```python
+@app.route('/status_code_complex')
+def complex():
+    response = make_response("<p>complex method</p>")
+    response.status_code = 201
+    return response
+```
