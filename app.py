@@ -32,5 +32,10 @@ def allofit():
     return render_template("allofit.html", items=colors)
 
 
+@app.route("/extending")
+def extending():
+    return render_template("extending.html")
+
+
 if __name__ == "__main__":
     app.run()
