@@ -26,5 +26,11 @@ def conditionals():
     return render_template("conditionals.html", name=user_name)
 
 
+@app.route("/allofit")
+def allofit():
+    colors = ["red", "black", "red", "black"]
+    return render_template("allofit.html", items=colors)
+
+
 if __name__ == "__main__":
     app.run()
