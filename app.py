@@ -14,5 +14,11 @@ def variables():
     return render_template("variables.html", name=user_name)
 
 
+@app.route("/loops")
+def loops():
+    fruits = ["apple", "banana", "cherry"]
+    return render_template("loops.html", items=fruits)
+
+
 if __name__ == "__main__":
     app.run()
