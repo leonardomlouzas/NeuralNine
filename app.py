@@ -37,5 +37,11 @@ def extending():
     return render_template("extending.html")
 
 
+@app.route("/filters")
+def filters():
+    user_name = "Leonardo"
+    return render_template("filters.html", name=user_name)
+
+
 if __name__ == "__main__":
     app.run()
