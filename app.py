@@ -20,5 +20,11 @@ def loops():
     return render_template("loops.html", items=fruits)
 
 
+@app.route("/conditionals")
+def conditionals():
+    user_name = "Leonardo"
+    return render_template("conditionals.html", name=user_name)
+
+
 if __name__ == "__main__":
     app.run()
