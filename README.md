@@ -1,4 +1,4 @@
-# Lesson 2
+# Lesson 3
 
 In this lesson we learn about HTML templates, the basic of Jinja2 with Flask (variables, functions, conditionals, filters) and also how to use dynamic end-points and redirects.
 
