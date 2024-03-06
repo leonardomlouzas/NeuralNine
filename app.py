@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, redirect, render_template, url_for
 
 app = Flask(__name__, template_folder="templates")
 
@@ -54,7 +54,11 @@ def dynamic_endpoints():
     return render_template("dynamic_endpoint.html")
 
 
-@app.template_filter("uppercase")
+@app.route("/redirect")
+def redirect_page():
+    return redirect(url_for("dynamic_endpoints"))
+
+
 @app.template_filter("reverse_string")
 def reverse_string(s):
     return s[::-1]
