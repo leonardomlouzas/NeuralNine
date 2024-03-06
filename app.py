@@ -3,7 +3,7 @@ from flask import Flask, render_template
 app = Flask(__name__, template_folder="templates")
 
 
-@app.route("/templates")
+@app.route("/templates_changed")
 def templates():
     return render_template("templates.html")
 
@@ -49,6 +49,12 @@ def custom_filters():
     return render_template("custom_filters.html", name=user_name)
 
 
+@app.route("/dynamic_endpoints")
+def dynamic_endpoints():
+    return render_template("dynamic_endpoint.html")
+
+
+@app.template_filter("uppercase")
 @app.template_filter("reverse_string")
 def reverse_string(s):
     return s[::-1]
