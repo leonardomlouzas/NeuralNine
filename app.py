@@ -1,78 +1,23 @@
-from flask import Flask, redirect, render_template, url_for
+from flask import Flask, render_template, request
 
 app = Flask(__name__, template_folder="templates")
 
 
-@app.route("/templates_changed")
-def templates():
-    return render_template("templates.html")
+@app.route("/", methods=["GET", "POST"])
+def index():
+    if request.method == "GET":
+        return render_template("index.html")
 
+    elif request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
 
-@app.route("/variables")
-def variables():
-    user_name = "Leonardo"
-    return render_template("variables.html", name=user_name)
+        if username == "Leo" and password == "1234":
+            return "Success."
 
-
-@app.route("/loops")
-def loops():
-    fruits = ["apple", "banana", "cherry"]
-    return render_template("loops.html", items=fruits)
-
-
-@app.route("/conditionals")
-def conditionals():
-    user_name = "Leonardo"
-    return render_template("conditionals.html", name=user_name)
-
-
-@app.route("/allofit")
-def allofit():
-    colors = ["red", "black", "red", "black"]
-    return render_template("allofit.html", items=colors)
-
-
-@app.route("/extending")
-def extending():
-    return render_template("extending.html")
-
-
-@app.route("/filters")
-def filters():
-    user_name = "Leonardo"
-    return render_template("filters.html", name=user_name)
-
-
-@app.route("/custom_filters")
-def custom_filters():
-    user_name = "Leonardo"
-    return render_template("custom_filters.html", name=user_name)
-
-
-@app.route("/dynamic_endpoints")
-def dynamic_endpoints():
-    return render_template("dynamic_endpoint.html")
-
-
-@app.route("/redirect")
-def redirect_page():
-    return redirect(url_for("dynamic_endpoints"))
-
-
-@app.template_filter("reverse_string")
-def reverse_string(s):
-    return s[::-1]
-
-
-@app.template_filter("repeat")
-def repeat(s, times=2):
-    return s * times
-
-
-@app.template_filter("alternate_case")
-def alternate_case(s):
-    return "".join([c.upper() if i % 2 == 0 else c.lower() for i, c in enumerate(s)])
+        else:
+            return "Failure."
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
