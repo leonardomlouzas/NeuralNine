@@ -2,7 +2,14 @@ import os
 import uuid
 
 import pandas as pd
-from flask import Flask, Response, render_template, request, send_from_directory
+from flask import (
+    Flask,
+    Response,
+    jsonify,
+    render_template,
+    request,
+    send_from_directory,
+)
 
 app = Flask(__name__, template_folder="templates")
 
@@ -84,6 +91,21 @@ def convert_to_csv_proper():
 @app.route("/download<filename>")
 def download(filename):
     return send_from_directory("downloads", filename, download_name="result.csv")
+
+
+@app.route("/javascript", methods=["GET", "POST"])
+def javascript():
+    if request.method == "GET":
+        return render_template("js.html")
+
+    elif request.method == "POST":
+        greeting = request.json.get("greeting")
+        name = request.json.get("name")
+
+        with open("./files/file.txt", "w") as f:
+            f.write(f"{greeting}, {name}")
+
+        return jsonify({"message": "Successfully written"})
 
 
 if __name__ == "__main__":

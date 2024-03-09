@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}JavaScript{% endblock %}
+
+{% block content %}
+<h1>5</h1>
+<button id="post_button">Send Post Request</button>
+<textarea type="text" id="greeting" placeholder="greeting"></textarea>
+<textarea type="text" id="name" placeholder="name"></textarea>
+
+<script type="text/javascript">
+    const  postButton = document.getElementById("post_button");
+
+
+    postButton.addEventListener("click", () => {
+        const greeting = document.getElementById("greeting").value;
+        const name = document.getElementById("name").value;
+        const jsonData = {name: name, greeting: greeting};
+        
+        fetch("{{ url_for("javascript") }}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json; charset=utf-8"
+            },
+            body: JSON.stringify(jsonData)
+        })
+            .then(response => response.json())
+            .then(data => console.log("Success:", data))
+            .catch((error) => {
+                console.error("Error:", error)
+            });
+    });
+</script>
+{% endblock %}
