@@ -1,203 +1,300 @@
-# Lesson 2
+# Lesson 4
 
-In this lesson we learn about HTML templates, the basic of Jinja2 with Flask (variables, functions, conditionals, filters) and also how to use dynamic end-points and redirects.
+In this lesson we learn about forms, file upload and download, and javascript requests.
 
-## HTML templates
+## Basic forms
 
-Up to this point we only returned strings or loose html code to the endpoint. Now we will learn how to use HTML templates.
+Let's talk about forms. We can retrieve information about a submitted form by accessing the form object of the request sent and use it the way we want, let's handle a login to use forms as example:
 
-First of all, create a folder which will hold all the templates. The common practice is to create a folder, on the root directory, called "templates".
-
-Then go to the `app.py` and edit the app creation to add the keyword argument `template_folder` which contains the directory where the "templates" folder is located.
+First, let's create a route that with GET and POST methods, one to display the form when we access the endpoint and the other to submit the form and log in.
 
 ```python
+from flask import Flask, render_template, request
 app = Flask(__name__, template_folder="templates")
-```
 
-> if you use the common practice name and location, you don't need to add the keyword argument
-
-Let's create a basic html file in the "templates" folder for the home page.
-
-```html
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Flask App</title>
-  </head>
-  <body>
-    <h1>Hello World</h1>
-  </body>
-</html>
-```
-
-Now that we have a folder for the templates and a basic template, let's use it on our app. For that, we need to import the `render_template` function from `flask`.
-
-```python
-from flask import Flask, render_template
-```
-
-And that's how we use it:
-
-```python
-@app.route('/')
+@app.route("/", methods=["GET", "POST"])
 def index():
-    return render_template('index.html')
+  if request.method == "GET":
+    return render_template("index.html")
+
+  elif request.method == "POST":
+    username = request.form.get("username")
+    password = request.form.get("password")
+
+    if username == "Leo" and password == "1234":
+      return "Success"
+
+    else:
+      return "Failure"
+
+
+if __name__ == "__main__":
+  app.run(debug=True)
 ```
 
-## Jinja2
+> We are making a simple string comparison to validate the log in just for the simplicity sake.
 
-Jinja2 is a templating language that help us with using programming logic in our html templates.
-
-### Variables
-
-We can pass and use variables from our python code in our html templates by passing them as arguments to the `render_template` function. For example:
-
-```python
-@app.route('/')
-def variables():
-    user_name = "Leonardo"
-    return render_template("variables.html", name=user_name)
-```
-
-> `name` will be the variable name used in the html template.
-
-And in the html template we use the syntax `{{ variable_name }}` to use the variable. For example:
+Create the `index.html` template:
 
 ```html
-<h1>Hello, {{ name }}</h1>
-```
-
-### Loops
-
-We can use for loops in our html templates by passing a list as an argument in the `render_template` function and using the `{% for %}` and `{% endfor %}` syntax. For example:
-
-```html
-<ul>
-  {% for item in items %}
-  <li>{{ item }}</li>
-  {% endfor %}
-</ul>
-```
-
-### Conditionals
-
-We can use conditionals in our html templates by using the `{% if %}` and `{% else %}` syntax. For example:
-
-```html
-{% if name == "Leonardo" %}
-<h1>Hello, {{ name }}</h1>
-{% else %}
-<h1>Hello, stranger</h1>
-{% endif %}
-```
-
-**Example of them together**
-
-We can easily put them together to make a more concise code. Like this:
-
-```html
-<ul>
-    {% for item in items %}
-        <li {% if item == "red" %} style = "color: red" {% endif %}> {{ item }} </li>
-    {% endfor %}
-</ul>
-```
-
-## Extending templates
-
-To help us with dealing with repeating common code between our templates, we can extend templates and use them in other templates. Let's see how it works.
-
-First we need to create a base template and use the `{% block %}` and `{% endblock %}` syntax to signal where we want to insert the other templates. For example:
-
-```html
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{% block title %} Default Title {% endblock %}</title>
-  </head>
-  <body>
-    {% block content %} Default Content {% endblock %}
-  </body>
-</html>
-```
-
-> Notice how we can add default values in case we don't pass any template.
-
-Now we can create a template that extends the base template using the `{% extends %}` syntax. For example:
-
-```html
-{% extends "base.html" %} {% block title %}Extending Templates{% endblock %} {%
-block content %}
-<h1>This was extended</h1>
+{% extends "base.html" %} {% block title %}Index Page{% endblock %} {% block
+content %}
+<h1>1</h1>
+<form method="POST" action="{{url_for('index')}}">
+  <input type="text" name="username" placeholder="Username" /><br />
+  <input type="password" name="password" placeholder="Password" /><br />
+  <input type="submit" value="Login" />
+</form>
 {% endblock %}
 ```
 
-### Basic filters
+Pay attention that the `name` defined on the each input of the form in the template is what we use on the `request.form.get(<name>)` python code.
 
-In Jinja2 it's not really possible to use methods on the variables we pass to the templates. To circumvent this, we use filters.
+### File upload
 
-In the templates, instead of using `.upper()` for example, we use `{{ variable|upper }}`, piping the variable to the filters we want to use.
+What if we want to upload a file through the forms? Easy. Let's see how:
 
-> [Here](https://tedboy.github.io/jinja2/templ14.html) is a list of built-in filters.
+> For this example, we are going to use simple text files and spreadsheets files, so we must install (`pip install pandas`) and import (`import pandas as pd`) pandas to handle them.
 
-For example:
-
-```html
-<h1>Hello, {{ name|upper }}</h1>
-<h1>Hello, {{ name|lower }}</h1>
-<h1>Hello, {{ name|title }}</h1>
-<h1>Hello, {{ name|capitalize }}</h1>
-<h1>Hello, {{ name|length }}</h1>
-<h1>Hello, {{ name|replace("o", "a") }}</h1>
-<h1>Hello, {{ name|replace("o", "a")|upper }}</h1>
-```
-
-### Custom filters
-
-If we need a filter that is not present in the built-in list, we can create our own. For that, lets create a function that will be used as our filter. Add the decorator `@app.template_filter("filter_name")` on top to make it usable as a filter in the templates. For example:
+The python code would look like this:
 
 ```python
-@app.template_filter("reverse_string")
-def reverse_string(s):
-  return s[::-1]
+@app.route("/file_upload", methods=["GET", "POST"])
+def file_upload():
+  if request.method == "GET":
+    return render_template("file_upload.html")
+
+  elif request.method == "POST":
+    file = request.files["file"]
+
+    # If the file is a simple .txt, the endpoint will read and return it as a string.
+    if file.content_type == "text/plain":
+      return file.read().decode()
+
+    # If the file is a spreadsheet, it will use pandas to read the file and return it as an html.
+    elif file.content_type in [
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "application/vnd.ms-excel",
+    ]:
+      df = pd.read_excel(file)
+      return df.to_html()
 ```
 
-Now you can go to the template and use it like this:
+The html template should look like this:
 
 ```html
-{{ variable|reverse_string }}
+{% extends "base.html" %} {% block title %} File Upload{% endblock %} {% block
+content %}
+<h1>2</h1>
+<form
+  method="POST"
+  action="{{url_for('file_upload')}}"
+  enctype="multipart/form-data"
+>
+  <input
+    type="file"
+    name="file"
+    accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, text/plain"
+    required="required"
+  />
+  <input type="submit" value="upload file" />
+</form>
+{% endblock %}
 ```
 
-## Dynamic End-points
+As you can see, this form contain a few new things. the `enctype` attribute is used to indicate that the form will be submitting binary data, such as files. The `accept` attribute is used to specify the types of files that the server will accept when the form is submitted.
 
-Sometimes we need to change the endpoint route on our application, and if we have it statically defined in our code/templates, we would have to change it everywhere. But flask help us with that by using the `url_for("function_name")` function. For example:
+### Basic file download
+
+Now that we have a file upload, let's see an easy way to download it from the server. For this example let's create a route that will receive a spreadsheet from the form, convert it to csv and download it on the user machine automatically.
+
+Add the `Response` object into the import list of flask:
+
+```python
+from flask import Flask, Response, render_template, request
+```
+
+Create a route to handle the `GET` and `POST`:
+
+```python
+@app.route("/convert_to_csv")
+def convert_to_csv():
+  if request.method == "GET":
+    return render_template("convert_to_csv.html")
+
+  elif request.method == "POST":
+    file = request.files["file"]
+
+    df = pd.read_excel(file)
+
+    # Creates a new Response object containing the converted file and the necessary properties to make it valid.
+    response = Response(
+      df.to_csv(),
+      mimetype="text/csv",
+      headers={"Content-Disposition": "attachment; filename=result.csv"},
+    )
+
+    return response
+```
+
+The html template looks like this:
 
 ```html
-<a href="{{ url_for('index') }}">Home</a>
+{% extends "base.html" %} {% block title %}File Convert{% endblock %} {% block
+content %}
+<h1>3</h1>
+<form
+  method="POST"
+  action="{{url_for('convert_to_csv')}}"
+  enctype="multipart/form-data"
+>
+  <input
+    type="file"
+    name="file"
+    accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+    required="required"
+  />
+  <input type="submit" value="upload file" />
+</form>
+{% endblock %}
 ```
 
-> It can also be used in the python code, more on that later.
+### Proper file download
 
-## Redirects
+Now that we have an understanding of how a file can be download, let's create proper endpoints which will take the file, store it in our server and return a download button to the user.
 
-If we want to redirect the user to another endpoint through the python code, we can do so by using the `redirect` function. For that, we need to import it:
+For that, let's import `os` to define where the files are going to be saved, `uuid` to name the files and prevent repeated names, and the `send_from_directory` function from flask:
 
 ```python
-from flask import Flask, render_template, redirect, url_for
+import os
+import uuid
+from flask import Flask, Response, render_template, request, send_from_directory
 ```
 
-> Notice that we also need to import the `url_for` function.
-
-Then we can use it like this:
+The route will look like this:
 
 ```python
-@app.route('/redirect')
-def redirect_page():
-    return redirect(url_for('index'))
+@app.route("/convert_to_csv_proper", methods=["GET", "POST"])
+def convert_to_csv_proper():
+  if request.method == "GET":
+    return render_template("convert_to_csv_proper.html")
+
+  elif request.method == "POST":
+    file = request.files["file"]
+
+    df = pd.read_excel(file)
+
+    # Creates the downloads folder if it doesn't exist
+    if not os.path.exists("downloads"):
+      os.makedirs("downloads")
+
+    filename = f"{uuid.uuid4()}.csv"
+
+    df.to_csv(os.path.join("downloads", filename))
+
+    return render_template("download.html", filename=filename)
+
+
+@app.route("/download<filename>")
+def download(filename):
+  return send_from_directory("downloads", filename, download_name="result.csv")
+```
+
+The `convert_to_csv_proper.html` template will look like this:
+
+```html
+{% extends "base.html" %} {% block title %}File Upload{% endblock %} {% block
+content %}
+<h1>4</h1>
+<form
+  method="POST"
+  action="{{url_for('convert_to_csv_proper')}}"
+  enctype="multipart/form-data"
+>
+  <input
+    type="file"
+    name="file"
+    accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+    required="required"
+  />
+  <input type="submit" value="upload file" />
+</form>
+```
+
+And the `download.html` template will look like this:
+
+```html
+{% extends "base.html" %} {% block title %}Download{% endblock %} {% block
+content %}
+<h1>Download</h1>
+
+<a href="{{url_for('download', filename=filename)}}">Download file</a>
+{% endblock %}
+```
+
+## JavaScript requests
+
+Now let's check how we can send, access and save information through javascript and json.
+
+First, add the `jsonify` to the flask import list
+
+```python
+from flask import Flask, Response, jsonify, render_template, request, send_from_directory
+```
+
+Create the route:
+
+```python
+@app.route("/javascript", methods=["GET", "POST"])
+def javascript():
+  if request.method == "GET":
+    return render_template("js.html")
+
+  elif request.method == "POST":
+    # Retrieves the variables from the request body sent in json format.
+    greeting = request.json.get("greeting")
+    name = request.json.get("name")
+
+    # Writes it down in a file in the server
+    with open("./files/file.txt", "w") as f:
+      f.write(f"{greeting}, {name}")
+
+    # returns a json to the user
+    return jsonify({"message": "Success."})
+```
+
+The template will be a bit bigger because the use of vanilla JavaScript and will look like this:
+
+```html
+{% extends "base.html" %} {% block title %}JavaScript{% endblock %} {% block
+content %}
+<h1>5</h1>
+<button id="post_button">Send Post Request</button>
+<textarea type="text" id="greeting" placeholder="greeting"></textarea>
+<textarea type="text" id="name" placeholder="name"></textarea>
+
+<script type="text/javascript">
+  const  postButton = document.getElementById("post_button");
+
+  postButton.addEventListener("click", () => {
+    const greeting = document.getElementById("greeting").value;
+    const name = document.getElementById("name").value;
+    const jsonData = {name: name, greeting: greeting};
+
+    fetch("{{ url_for("javascript") }}", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json; charset=utf-8"
+      },
+
+      body: JSON.stringify(jsonData)
+    })
+      .then(response => response.json())
+      .then(data => console.log("Success:", data))
+      .catch((error) => {
+        console.error("Error:", error)
+      });
+  });
+</script>
+{% endblock %}
 ```
