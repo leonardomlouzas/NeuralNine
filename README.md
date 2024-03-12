@@ -1,300 +1,86 @@
 # Lesson 4
 
-In this lesson we learn about forms, file upload and download, and javascript requests.
+In this lesson we learn about handling static files in our application and use that knowledge to add bootstrap into it.
 
-## Basic forms
+## Static files
 
-Let's talk about forms. We can retrieve information about a submitted form by accessing the form object of the request sent and use it the way we want, let's handle a login to use forms as example:
+Static files are files that are served directly to the client without any processing by the server. In those types of files are included images, css and javascript, for example.
 
-First, let's create a route that with GET and POST methods, one to display the form when we access the endpoint and the other to submit the form and log in.
+First thing we need to do is create a folder to store those types of file. In the root folder of our project, create a folder called `static` which will contain those folders inside: `css`, `js`, `img`.
+
+> Those are just the common practice names and you can change them to whatever you like.
+
+After that, we need to make that folder available to our application. The `static_folder="static_folder_location"` will determine the location of the static files and the `static_url_path=""` will specify the URL path prefix for static files.
 
 ```python
-from flask import Flask, render_template, request
-app = Flask(__name__, template_folder="templates")
-
-@app.route("/", methods=["GET", "POST"])
-def index():
-  if request.method == "GET":
-    return render_template("index.html")
-
-  elif request.method == "POST":
-    username = request.form.get("username")
-    password = request.form.get("password")
-
-    if username == "Leo" and password == "1234":
-      return "Success"
-
-    else:
-      return "Failure"
-
-
-if __name__ == "__main__":
-  app.run(debug=True)
+app = Flask(__name__, template_folder="templates", static_folder="static", static_url_path="/")
 ```
 
-> We are making a simple string comparison to validate the log in just for the simplicity sake.
+> if you use the common practice name and location for them, you don't need to add their keyword arguments.
 
-Create the `index.html` template:
+### Images
+
+Great! Now we have the foundation to use static files. Let's see it in action with an image.
+
+Add the image of your preference to the img folder and in a html template, simply add the html `img` tag and the property `src` containing the path to the image starting from where the `static_url_path` was defined.
 
 ```html
 {% extends "base.html" %} {% block title %}Index Page{% endblock %} {% block
 content %}
-<h1>1</h1>
-<form method="POST" action="{{url_for('index')}}">
-  <input type="text" name="username" placeholder="Username" /><br />
-  <input type="password" name="password" placeholder="Password" /><br />
-  <input type="submit" value="Login" />
-</form>
+<h1>Image</h1>
+<img src="/img/image.jpg" alt="Simple image" />
 {% endblock %}
 ```
 
-Pay attention that the `name` defined on the each input of the form in the template is what we use on the `request.form.get(<name>)` python code.
+### CSS
 
-### File upload
+The same principle will apply for CSS files. For example, save a .css file in the css folder:
 
-What if we want to upload a file through the forms? Easy. Let's see how:
-
-> For this example, we are going to use simple text files and spreadsheets files, so we must install (`pip install pandas`) and import (`import pandas as pd`) pandas to handle them.
-
-The python code would look like this:
-
-```python
-@app.route("/file_upload", methods=["GET", "POST"])
-def file_upload():
-  if request.method == "GET":
-    return render_template("file_upload.html")
-
-  elif request.method == "POST":
-    file = request.files["file"]
-
-    # If the file is a simple .txt, the endpoint will read and return it as a string.
-    if file.content_type == "text/plain":
-      return file.read().decode()
-
-    # If the file is a spreadsheet, it will use pandas to read the file and return it as an html.
-    elif file.content_type in [
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      "application/vnd.ms-excel",
-    ]:
-      df = pd.read_excel(file)
-      return df.to_html()
+```css
+h1 {
+  color: red;
+  font-size: 18pt;
+}
 ```
 
-The html template should look like this:
+And modify the base.html file to add the css call, with the `href` property referencing the path to the css file, starting from where the `static_url_path` was defined.
 
 ```html
-{% extends "base.html" %} {% block title %} File Upload{% endblock %} {% block
-content %}
-<h1>2</h1>
-<form
-  method="POST"
-  action="{{url_for('file_upload')}}"
-  enctype="multipart/form-data"
->
-  <input
-    type="file"
-    name="file"
-    accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, text/plain"
-    required="required"
-  />
-  <input type="submit" value="upload file" />
-</form>
-{% endblock %}
+<link rel="stylesheet" type="text/css" href="/css/style.css" />
 ```
 
-As you can see, this form contain a few new things. the `enctype` attribute is used to indicate that the form will be submitting binary data, such as files. The `accept` attribute is used to specify the types of files that the server will accept when the form is submitted.
+### Javascript
 
-### Basic file download
+The process for JavaScript is basically the same as the other two. Let's create a js function that shows a popup after 5 seconds after the index page loads as an example:
 
-Now that we have a file upload, let's see an easy way to download it from the server. For this example let's create a route that will receive a spreadsheet from the form, convert it to csv and download it on the user machine automatically.
+Create the js file and place it inside the js folder:
 
-Add the `Response` object into the import list of flask:
-
-```python
-from flask import Flask, Response, render_template, request
+```js
+window.onload = function () {
+  setTimeout(function () {
+    alert("Hello, World");
+  }, 5000);
+};
 ```
 
-Create a route to handle the `GET` and `POST`:
-
-```python
-@app.route("/convert_to_csv")
-def convert_to_csv():
-  if request.method == "GET":
-    return render_template("convert_to_csv.html")
-
-  elif request.method == "POST":
-    file = request.files["file"]
-
-    df = pd.read_excel(file)
-
-    # Creates a new Response object containing the converted file and the necessary properties to make it valid.
-    response = Response(
-      df.to_csv(),
-      mimetype="text/csv",
-      headers={"Content-Disposition": "attachment; filename=result.csv"},
-    )
-
-    return response
-```
-
-The html template looks like this:
+Then simply call the script tag, in your template, with the `src` property referencing the path to the js file, starting from where the `static_url_path` was defined.
 
 ```html
-{% extends "base.html" %} {% block title %}File Convert{% endblock %} {% block
-content %}
-<h1>3</h1>
-<form
-  method="POST"
-  action="{{url_for('convert_to_csv')}}"
-  enctype="multipart/form-data"
->
-  <input
-    type="file"
-    name="file"
-    accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-    required="required"
-  />
-  <input type="submit" value="upload file" />
-</form>
-{% endblock %}
+<script src="/js/alert.js"></script>
 ```
 
-### Proper file download
+## Bootstrap
 
-Now that we have an understanding of how a file can be download, let's create proper endpoints which will take the file, store it in our server and return a download button to the user.
+At last, let's see how to add Bootstrap to our project by downloading the compiled files and using them.
 
-For that, let's import `os` to define where the files are going to be saved, `uuid` to name the files and prevent repeated names, and the `send_from_directory` function from flask:
+After download the zip file from the [bootstrap website](https://getbootstrap.com/docs/4.1/getting-started/download/), extract them to their respective folders in our project. CSS files into css folder, JS files into JS folder.
 
-```python
-import os
-import uuid
-from flask import Flask, Response, render_template, request, send_from_directory
-```
-
-The route will look like this:
-
-```python
-@app.route("/convert_to_csv_proper", methods=["GET", "POST"])
-def convert_to_csv_proper():
-  if request.method == "GET":
-    return render_template("convert_to_csv_proper.html")
-
-  elif request.method == "POST":
-    file = request.files["file"]
-
-    df = pd.read_excel(file)
-
-    # Creates the downloads folder if it doesn't exist
-    if not os.path.exists("downloads"):
-      os.makedirs("downloads")
-
-    filename = f"{uuid.uuid4()}.csv"
-
-    df.to_csv(os.path.join("downloads", filename))
-
-    return render_template("download.html", filename=filename)
-
-
-@app.route("/download<filename>")
-def download(filename):
-  return send_from_directory("downloads", filename, download_name="result.csv")
-```
-
-The `convert_to_csv_proper.html` template will look like this:
+And combining what we did in the CSS and Javascript section, modify the base.html file to add the bootstrap call, with the `href` property referencing the path to the bootstrap css file, starting from where the `static_url_path` was defined, and the script call with the `src` property referencing the path to the bootstrap js file, starting from where the `static_url_path` was defined.
 
 ```html
-{% extends "base.html" %} {% block title %}File Upload{% endblock %} {% block
-content %}
-<h1>4</h1>
-<form
-  method="POST"
-  action="{{url_for('convert_to_csv_proper')}}"
-  enctype="multipart/form-data"
->
-  <input
-    type="file"
-    name="file"
-    accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-    required="required"
-  />
-  <input type="submit" value="upload file" />
-</form>
-```
+<!-- Inside the head tag -->
+<link rel="stylesheet" type="text/css" href="/css/bootstrap.css" />
 
-And the `download.html` template will look like this:
-
-```html
-{% extends "base.html" %} {% block title %}Download{% endblock %} {% block
-content %}
-<h1>Download</h1>
-
-<a href="{{url_for('download', filename=filename)}}">Download file</a>
-{% endblock %}
-```
-
-## JavaScript requests
-
-Now let's check how we can send, access and save information through javascript and json.
-
-First, add the `jsonify` to the flask import list
-
-```python
-from flask import Flask, Response, jsonify, render_template, request, send_from_directory
-```
-
-Create the route:
-
-```python
-@app.route("/javascript", methods=["GET", "POST"])
-def javascript():
-  if request.method == "GET":
-    return render_template("js.html")
-
-  elif request.method == "POST":
-    # Retrieves the variables from the request body sent in json format.
-    greeting = request.json.get("greeting")
-    name = request.json.get("name")
-
-    # Writes it down in a file in the server
-    with open("./files/file.txt", "w") as f:
-      f.write(f"{greeting}, {name}")
-
-    # returns a json to the user
-    return jsonify({"message": "Success."})
-```
-
-The template will be a bit bigger because the use of vanilla JavaScript and will look like this:
-
-```html
-{% extends "base.html" %} {% block title %}JavaScript{% endblock %} {% block
-content %}
-<h1>5</h1>
-<button id="post_button">Send Post Request</button>
-<textarea type="text" id="greeting" placeholder="greeting"></textarea>
-<textarea type="text" id="name" placeholder="name"></textarea>
-
-<script type="text/javascript">
-  const  postButton = document.getElementById("post_button");
-
-  postButton.addEventListener("click", () => {
-    const greeting = document.getElementById("greeting").value;
-    const name = document.getElementById("name").value;
-    const jsonData = {name: name, greeting: greeting};
-
-    fetch("{{ url_for("javascript") }}", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json; charset=utf-8"
-      },
-
-      body: JSON.stringify(jsonData)
-    })
-      .then(response => response.json())
-      .then(data => console.log("Success:", data))
-      .catch((error) => {
-        console.error("Error:", error)
-      });
-  });
-</script>
-{% endblock %}
+<!-- inside the body tag-->
+<script src="/js/bootstrap.js"></script>
 ```
