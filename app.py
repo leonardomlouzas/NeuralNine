@@ -88,7 +88,7 @@ def convert_to_csv_proper():
         return render_template("download.html", filename=filename)
 
 
-@app.route("/download<filename>")
+@app.route("/download/<filename>")
 def download(filename):
     return send_from_directory("downloads", filename, download_name="result.csv")
 
