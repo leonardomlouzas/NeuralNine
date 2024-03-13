@@ -1,4 +1,4 @@
-from flask import Flask, make_response, render_template, session
+from flask import Flask, make_response, render_template, request, session
 
 app = Flask(__name__, template_folder="templates")
 app.secret_key = "Secret Key"
@@ -48,6 +48,13 @@ def cookie_set():
     response.set_cookie("cookie_name", "cookie_value")
 
     return response
+
+
+@app.route("/cookies_get")
+def cookie_get():
+    cookie_value = request.cookies.get("cookie_name")
+    message = cookie_value if cookie_value else "No cookie with this name"
+    return render_template("index.html", message=message)
 
 
 if __name__ == "__main__":
