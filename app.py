@@ -57,5 +57,15 @@ def cookie_get():
     return render_template("index.html", message=message)
 
 
+@app.route("/cookies_delete")
+def cookie_delete():
+    response = make_response(
+        render_template("index.html", message="Cookies deleted successfully.")
+    )
+    response.set_cookie("cookie_name", expires=0)
+
+    return response
+
+
 if __name__ == "__main__":
     app.run(debug=True)
