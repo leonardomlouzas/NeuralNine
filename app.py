@@ -1,4 +1,4 @@
-from flask import Flask, make_response, render_template, request, session
+from flask import Flask, flash, make_response, render_template, request, session
 
 app = Flask(__name__, template_folder="templates")
 app.secret_key = "Secret Key"
@@ -65,6 +65,25 @@ def cookie_delete():
     response.set_cookie("cookie_name", expires=0)
 
     return response
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "GET":
+        return render_template("login.html")
+
+    elif request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+
+        if username == "leo" and password == "1234":
+            flash_message = "Login Successfully."
+
+        else:
+            flash_message = "Login Failed."
+
+        flash(flash_message)
+        return render_template("index.html")
 
 
 if __name__ == "__main__":
