@@ -29,5 +29,16 @@ def session_get():
     return render_template("index.html", message=formatted_message)
 
 
+@app.route("/session_delete")
+def session_delete():
+    # This delete only one info in the session
+    session.pop("username")
+
+    # This clear all info in the session
+    session.clear()
+
+    return render_template("index.html", message="Session data deleted successfully.")
+
+
 if __name__ == "__main__":
     app.run(debug=True)
