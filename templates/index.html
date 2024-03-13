@@ -3,8 +3,10 @@
 
 {% block content %}
     <h1>{{ message }}</h1>
+    <hr/>
 
     <a href="{{ url_for('session_set') }}">Set session data</a>
     <a href="{{ url_for('session_get') }}">Get session data</a>
-    <a href="{{ url_for('session_delete') }}">Delete session data</a>
+    <a href="{{ url_for('session_delete') }}">Delete session data</a><br /><br />
+    <a href="{{ url_for('cookie_set') }}">Set cookie data</a>
 {% endblock %}

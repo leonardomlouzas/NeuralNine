@@ -1,4 +1,4 @@
-from flask import Flask, render_template, session
+from flask import Flask, make_response, render_template, session
 
 app = Flask(__name__, template_folder="templates")
 app.secret_key = "Secret Key"
@@ -38,6 +38,16 @@ def session_delete():
     session.clear()
 
     return render_template("index.html", message="Session data deleted successfully.")
+
+
+@app.route("/cookie_set")
+def cookie_set():
+    response = make_response(
+        render_template("index.html", message="Cookies set successfully.")
+    )
+    response.set_cookie("cookie_name", "cookie_value")
+
+    return response
 
 
 if __name__ == "__main__":
