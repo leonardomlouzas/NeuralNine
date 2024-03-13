@@ -17,5 +17,17 @@ def session_set():
     return render_template("index.html", message="Session data set successfully")
 
 
+@app.route("/session_get")
+def session_get():
+    name = session.get("username")
+    message = session.get("message")
+
+    formatted_message = (
+        f"{name}. {message}." if name and message else "Session not valid."
+    )
+
+    return render_template("index.html", message=formatted_message)
+
+
 if __name__ == "__main__":
     app.run(debug=True)

@@ -1,6 +1,9 @@
-{% extends "base.html" %} {% block title %}Index Page{% endblock %} {% block
-content %}
-<h1>{{ message }}</h1>
+{% extends "base.html" %}
+{% block title %}Index Page{% endblock %}
 
-<a href="{{ url_for('session_set') }}">Set session data</a>
+{% block content %}
+    <h1>{{ message }}</h1>
+
+    <a href="{{ url_for('session_set') }}">Set session data</a>
+    <a href="{{ url_for('session_get') }}">Get session data</a>
 {% endblock %}
